@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Share Location</title>
     <style>
-        #shareLocationButton, #callOwnerButton {
+        #shareLocationButton, #callParentsButton, #whatsappParentButton {
             padding: 20px 40px;
             font-size: 24px;
             background-color: #007BFF;
@@ -19,7 +19,7 @@
             margin-top: 10px;
         }
 
-        #shareLocationButton:hover, #callOwnerButton:hover {
+        #shareLocationButton:hover, #callParentsButton:hover, #whatsappParentButton:hover {
             background-color: #0056b3;
         }
 
@@ -54,7 +54,8 @@
         <a id="emailLink" href="#" target="_blank">Send via Email</a>
     </div>
 
-    <button id="callOwnerButton">Call Pet's Owner</button>
+    <button id="callParentsButton">Call Pet's Parents</button>
+    <button id="whatsappParentButton">WhatsApp Pet's Parent</button>
 
     <script>
         document.getElementById("shareLocationButton").addEventListener("click", function() {
@@ -84,8 +85,14 @@
 
                                 document.getElementById("locationLink").style.display = 'block';
 
-                                document.getElementById("callOwnerButton").addEventListener("click", function() {
+                                document.getElementById("callParentsButton").addEventListener("click", function() {
                                     window.location.href = `tel:${data.phone}`;
+                                });
+
+                                // WhatsApp Pet's Parent functionality
+                                document.getElementById("whatsappParentButton").addEventListener("click", function() {
+                                    const whatsappParentLink = `https://wa.me/${data.parentPhone}?text=Hi, I am contacting you regarding ${data.petName}.`;
+                                    window.open(whatsappParentLink, "_blank");
                                 });
                             }, function(error) {
                                 alert("Error getting your location. Please try again later.");
