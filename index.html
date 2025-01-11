@@ -71,6 +71,34 @@
     <button id="whatsappParentsButton">WhatsApp Pet's Parents</button>
 
     <script>
+        // Function to extract URL parameters
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        // Get phone numbers from the URL
+        const parentPhone = getQueryParam("parentPhone");
+        const phone = getQueryParam("phone");
+
+        // Update the call button
+        if (parentPhone) {
+            document.getElementById("callParentsButton").onclick = function() {
+                window.location.href = `tel:${parentPhone}`;
+            };
+        }
+
+        // Update the WhatsApp button
+        if (parentPhone) {
+            document.getElementById("whatsappParentsButton").onclick = function() {
+                const whatsappParentLink = `https://wa.me/${parentPhone}?text=Hi, I am contacting you regarding your pet.`;
+                window.open(whatsappParentLink, "_blank");
+            };
+        }
+
+        // Force update button text (for caching issues)
+        document.getElementById("whatsappParentsButton").innerText = "WhatsApp Pet's Parents";
+
         document.getElementById("shareLocationButton").addEventListener("click", function() {
             document.getElementById("loadingMessage").style.display = 'block';
 
@@ -90,22 +118,13 @@
 
                                 const locationMessage = `Hello, I am sharing my current location for ${data.petName}. Latitude: ${latitude}, Longitude: ${longitude}. You can view it on Google Maps here: https://www.google.com/maps?q=${latitude},${longitude}`;
 
-                                const whatsappLink = `https://wa.me/${data.phone}?text=${encodeURIComponent(locationMessage)}`;
+                                const whatsappLink = `https://wa.me/${phone}?text=${encodeURIComponent(locationMessage)}`;
                                 const emailLink = `mailto:${data.email}?subject=My Location&body=${encodeURIComponent(locationMessage)}`;
 
                                 document.getElementById("whatsappLink").href = whatsappLink;
                                 document.getElementById("emailLink").href = emailLink;
 
                                 document.getElementById("locationLink").style.display = 'block';
-
-                                document.getElementById("callParentsButton").addEventListener("click", function() {
-                                    window.location.href = `tel:${data.phone}`;
-                                });
-
-                                document.getElementById("whatsappParentsButton").addEventListener("click", function() {
-                                    const whatsappParentLink = `https://wa.me/${data.parentPhone}?text=Hi, I am contacting you regarding ${data.petName}.`;
-                                    window.open(whatsappParentLink, "_blank");
-                                });
                             }, function(error) {
                                 alert("Error getting your location. Please try again later.");
                                 document.getElementById("loadingMessage").style.display = 'none';
