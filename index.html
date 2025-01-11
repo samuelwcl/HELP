@@ -23,6 +23,13 @@
             background-color: #0056b3;
         }
 
+        #loadingMessage {
+            display: none;
+            font-size: 18px;
+            color: #555;
+            margin-top: 20px;
+        }
+
         #locationLink {
             display: none;
             margin-top: 20px;
@@ -31,13 +38,6 @@
         #locationLink a {
             display: block;
             margin-top: 10px;
-        }
-
-        #loadingMessage {
-            display: none;
-            font-size: 18px;
-            color: #555;
-            margin-top: 20px;
         }
     </style>
 </head>
@@ -48,8 +48,8 @@
     <button id="emailButton">Email Pet's Parent</button>
     <button id="callOwnerButton">Call Pet's Parents</button>
 
-    <!-- Loading message while waiting for location -->
-    <div id="loadingMessage">Please wait... Retrieving your location...</div>
+    <!-- Loading message while waiting for data -->
+    <div id="loadingMessage">Please wait... Retrieving data...</div>
 
     <div id="locationLink">
         <p>Click below to share the location:</p>
@@ -58,122 +58,77 @@
     </div>
 
     <script>
-        document.getElementById("shareLocationButton").addEventListener("click", function() {
-            // Show the loading message while waiting for the location
+        // Function to fetch pet data
+        function fetchPetData() {
+            // Show the loading message while fetching data
             document.getElementById("loadingMessage").style.display = 'block';
 
             const urlParams = new URLSearchParams(window.location.search);
             const code = urlParams.get('code'); // Get the 'code' from the URL parameter
 
-            if (code) {
-                // Fetch data from the Google Apps Script Web App with the code
-                fetch(`https://script.google.com/macros/s/AKfycbwXgfpC4e5_B7nBSosO8q5o2-MYOaMv6r6I6OgkDA6zB9Xoez-xPWfl9CL9yUc9psq5/exec?code=${code}`)
-                    .then(response => {
-                        console.log("Response status:", response.status); // Log response status
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log("Data received:", data); // Log the data received
+            return fetch(`https://script.google.com/macros/s/AKfycbwXgfpC4e5_B7nBSosO8q5o2-MYOaMv6r6I6OgkDA6zB9Xoez-xPWfl9CL9yUc9psq5/exec?code=${code}`)
+                .then(response => response.json())
+                .catch(error => {
+                    alert("Error fetching data. Please try again later.");
+                    console.error("Error:", error);
+                    document.getElementById("loadingMessage").style.display = 'none';
+                });
+        }
+
+        // Button to Share Pet's Location
+        document.getElementById("shareLocationButton").addEventListener("click", function() {
+            fetchPetData().then(data => {
+                // Once data is fetched, proceed with geolocation and sharing options
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(function(position) {
+                        const latitude = position.coords.latitude;
+                        const longitude = position.coords.longitude;
+
+                        // Format the message to include pet name and current location
+                        const locationMessage = `Hello, I am sharing my current location for ${data.petName}. Latitude: ${latitude}, Longitude: ${longitude}. You can view it on Google Maps here: https://www.google.com/maps?q=${latitude},${longitude}`;
+
+                        // Set links for sharing
+                        document.getElementById("whatsappLink").href = `https://wa.me/${data.parentPhone}?text=${encodeURIComponent(locationMessage)}`;
+                        document.getElementById("emailLink").href = `mailto:${data.parentEmail}?subject=My Pet's Location&body=${encodeURIComponent(locationMessage)}`;
+
+                        // Show the sharing options
+                        document.getElementById("locationLink").style.display = 'block';
                         document.getElementById("loadingMessage").style.display = 'none';
-
-                        // Use Geolocation API to get current location
-                        if (navigator.geolocation) {
-                            navigator.geolocation.getCurrentPosition(function(position) {
-                                const latitude = position.coords.latitude;
-                                const longitude = position.coords.longitude;
-
-                                // Format the message to include pet name and current location
-                                const locationMessage = `Hello, I am sharing my current location for ${data.petName}. Latitude: ${latitude}, Longitude: ${longitude}. You can view it on Google Maps here: https://www.google.com/maps?q=${latitude},${longitude}`;
-
-                                const whatsappLink = `https://wa.me/${data.parentPhone}?text=${encodeURIComponent(locationMessage)}`;
-                                const emailLink = `mailto:${data.parentEmail}?subject=My Pet's Location&body=${encodeURIComponent(locationMessage)}`;
-
-                                // Set the href attributes dynamically
-                                document.getElementById("whatsappLink").href = whatsappLink;
-                                document.getElementById("emailLink").href = emailLink;
-
-                                // Show the sharing options
-                                document.getElementById("locationLink").style.display = 'block';
-                            }, function(error) {
-                                alert("Error getting your location. Please try again later.");
-                                document.getElementById("loadingMessage").style.display = 'none';
-                            });
-                        } else {
-                            alert("Geolocation is not supported by this browser.");
-                            document.getElementById("loadingMessage").style.display = 'none';
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Fetch error:", error); // Log the error
+                    }, function(error) {
+                        alert("Error getting your location. Please try again later.");
                         document.getElementById("loadingMessage").style.display = 'none';
-                        alert("Error fetching data. Please try again later.");
                     });
-            } else {
-                alert("Invalid or missing code.");
-                document.getElementById("loadingMessage").style.display = 'none';
-            }
+                } else {
+                    alert("Geolocation is not supported by this browser.");
+                    document.getElementById("loadingMessage").style.display = 'none';
+                }
+            });
         });
 
         // Button to WhatsApp Pet's Parent
         document.getElementById("whatsappButton").addEventListener("click", function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const code = urlParams.get('code'); // Get the 'code' from the URL parameter
-
-            if (code) {
-                fetch(`https://script.google.com/macros/s/AKfycbwXgfpC4e5_B7nBSosO8q5o2-MYOaMv6r6I6OgkDA6zB9Xoez-xPWfl9CL9yUc9psq5/exec?code=${code}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        const message = `Hello, I'm contacting you about ${data.petName}.`;
-                        const whatsappLink = `https://wa.me/${data.parentPhone}?text=${encodeURIComponent(message)}`;
-                        window.open(whatsappLink, "_blank");
-                    })
-                    .catch(error => {
-                        alert("Error fetching data for WhatsApp.");
-                    });
-            } else {
-                alert("Invalid or missing code.");
-            }
+            fetchPetData().then(data => {
+                const message = `Hello, I'm contacting you about ${data.petName}.`;
+                const whatsappLink = `https://wa.me/${data.parentPhone}?text=${encodeURIComponent(message)}`;
+                window.open(whatsappLink, "_blank");
+            });
         });
 
         // Button to Email Pet's Parent
         document.getElementById("emailButton").addEventListener("click", function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const code = urlParams.get('code'); // Get the 'code' from the URL parameter
-
-            if (code) {
-                fetch(`https://script.google.com/macros/s/AKfycbwXgfpC4e5_B7nBSosO8q5o2-MYOaMv6r6I6OgkDA6zB9Xoez-xPWfl9CL9yUc9psq5/exec?code=${code}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        const subject = `My Pet's Location`;
-                        const body = `Hello, I'm sharing my pet's location. Pet: ${data.petName}.`;
-                        const emailLink = `mailto:${data.parentEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-                        window.location.href = emailLink;
-                    })
-                    .catch(error => {
-                        alert("Error fetching data for email.");
-                    });
-            } else {
-                alert("Invalid or missing code.");
-            }
+            fetchPetData().then(data => {
+                const subject = `My Pet's Location`;
+                const body = `Hello, I'm sharing my pet's location. Pet: ${data.petName}.`;
+                const emailLink = `mailto:${data.parentEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                window.location.href = emailLink;
+            });
         });
 
         // Button to Call Pet's Parent
         document.getElementById("callOwnerButton").addEventListener("click", function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const code = urlParams.get('code'); // Get the 'code' from the URL parameter
-
-            if (code) {
-                fetch(`https://script.google.com/macros/s/AKfycbwXgfpC4e5_B7nBSosO8q5o2-MYOaMv6r6I6OgkDA6zB9Xoez-xPWfl9CL9yUc9psq5/exec?code=${code}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        window.location.href = `tel:${data.parentPhone}`;
-                    })
-                    .catch(error => {
-                        alert("Error fetching data for phone call.");
-                    });
-            } else {
-                alert("Invalid or missing code.");
-            }
+            fetchPetData().then(data => {
+                window.location.href = `tel:${data.parentPhone}`;
+            });
         });
     </script>
 
