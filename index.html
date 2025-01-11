@@ -43,10 +43,11 @@
 </head>
 <body>
 
+    <!-- Buttons arranged in correct order -->
     <button id="shareLocationButton">Share Pet's Location</button>
-    <button id="whatsappButton">WhatsApp Pet's Parent</button>
-    <button id="emailButton">Email Pet's Parent</button>
     <button id="callOwnerButton">Call Pet's Parents</button>
+    <button id="whatsappButton">WhatsApp Pet's Parents</button>
+    <button id="emailButton">Email Pet's Parent</button>
 
     <!-- Loading message while waiting for data -->
     <div id="loadingMessage">Please wait... Retrieving data...</div>
@@ -105,7 +106,14 @@
             });
         });
 
-        // Button to WhatsApp Pet's Parent
+        // Button to Call Pet's Parents
+        document.getElementById("callOwnerButton").addEventListener("click", function() {
+            fetchPetData().then(data => {
+                window.location.href = `tel:${data.parentPhone}`;
+            });
+        });
+
+        // Button to WhatsApp Pet's Parents
         document.getElementById("whatsappButton").addEventListener("click", function() {
             fetchPetData().then(data => {
                 const message = `Hello, I'm contacting you about ${data.petName}.`;
@@ -121,13 +129,6 @@
                 const body = `Hello, I'm sharing my pet's location. Pet: ${data.petName}.`;
                 const emailLink = `mailto:${data.parentEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
                 window.location.href = emailLink;
-            });
-        });
-
-        // Button to Call Pet's Parent
-        document.getElementById("callOwnerButton").addEventListener("click", function() {
-            fetchPetData().then(data => {
-                window.location.href = `tel:${data.parentPhone}`;
             });
         });
     </script>
