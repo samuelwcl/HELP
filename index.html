@@ -71,12 +71,9 @@
     <button id="whatsappParentsButton">WhatsApp Pet's Parents</button>
 
     <script>
-        // Force update button text in case of caching issues
-        document.getElementById("whatsappParentsButton").innerText = "WhatsApp Pet's Parents";
+        let petData = null; // Global variable to store pet details
 
-        document.getElementById("shareLocationButton").addEventListener("click", function() {
-            document.getElementById("loadingMessage").style.display = 'block';
-
+        document.addEventListener("DOMContentLoaded", function() {
             const urlParams = new URLSearchParams(window.location.search);
             const code = urlParams.get('code');
 
@@ -84,46 +81,62 @@
                 fetch(`https://script.google.com/macros/s/AKfycbwXgfpC4e5_B7nBSosO8q5o2-MYOaMv6r6I6OgkDA6zB9Xoez-xPWfl9CL9yUc9psq5/exec?code=${code}`)
                     .then(response => response.json())
                     .then(data => {
-                        document.getElementById("loadingMessage").style.display = 'none';
+                        petData = data; // Store fetched data globally
 
-                        if (navigator.geolocation) {
-                            navigator.geolocation.getCurrentPosition(function(position) {
-                                const latitude = position.coords.latitude;
-                                const longitude = position.coords.longitude;
+                        // Update button event listeners now that we have data
+                        document.getElementById("callParentsButton").addEventListener("click", function() {
+                            if (petData && petData.phone) {
+                                window.location.href = `tel:${petData.phone}`;
+                            } else {
+                                alert("Parent's phone number not available.");
+                            }
+                        });
 
-                                const locationMessage = `Hello, I am sharing my current location for ${data.petName}. Latitude: ${latitude}, Longitude: ${longitude}. You can view it on Google Maps here: https://www.google.com/maps?q=${latitude},${longitude}`;
-
-                                const whatsappLink = `https://wa.me/${data.phone}?text=${encodeURIComponent(locationMessage)}`;
-                                const emailLink = `mailto:${data.email}?subject=My Location&body=${encodeURIComponent(locationMessage)}`;
-
-                                document.getElementById("whatsappLink").href = whatsappLink;
-                                document.getElementById("emailLink").href = emailLink;
-
-                                document.getElementById("locationLink").style.display = 'block';
-
-                                document.getElementById("callParentsButton").addEventListener("click", function() {
-                                    window.location.href = `tel:${data.phone}`;
-                                });
-
-                                document.getElementById("whatsappParentsButton").addEventListener("click", function() {
-                                    const whatsappParentLink = `https://wa.me/${data.parentPhone}?text=Hi, I am contacting you regarding ${data.petName}.`;
-                                    window.open(whatsappParentLink, "_blank");
-                                });
-                            }, function(error) {
-                                alert("Error getting your location. Please try again later.");
-                                document.getElementById("loadingMessage").style.display = 'none';
-                            });
-                        } else {
-                            alert("Geolocation is not supported by this browser.");
-                            document.getElementById("loadingMessage").style.display = 'none';
-                        }
+                        document.getElementById("whatsappParentsButton").addEventListener("click", function() {
+                            if (petData && petData.parentPhone) {
+                                const whatsappParentLink = `https://wa.me/${petData.parentPhone}?text=Hi, I am contacting you regarding ${petData.petName}.`;
+                                window.open(whatsappParentLink, "_blank");
+                            } else {
+                                alert("Parent's WhatsApp number not available.");
+                            }
+                        });
                     })
                     .catch(error => {
-                        document.getElementById("loadingMessage").style.display = 'none';
+                        console.error("Error fetching pet data:", error);
                         alert("Error fetching data. Please try again later.");
                     });
             } else {
                 alert("Invalid or missing code.");
+            }
+        });
+
+        document.getElementById("shareLocationButton").addEventListener("click", function() {
+            document.getElementById("loadingMessage").style.display = 'block';
+
+            if (petData) {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(function(position) {
+                        document.getElementById("loadingMessage").style.display = 'none';
+
+                        const latitude = position.coords.latitude;
+                        const longitude = position.coords.longitude;
+
+                        const locationMessage = `Hello, I am sharing my current location for ${petData.petName}. Latitude: ${latitude}, Longitude: ${longitude}. You can view it on Google Maps here: https://www.google.com/maps?q=${latitude},${longitude}`;
+
+                        document.getElementById("whatsappLink").href = `https://wa.me/${petData.phone}?text=${encodeURIComponent(locationMessage)}`;
+                        document.getElementById("emailLink").href = `mailto:${petData.email}?subject=My Location&body=${encodeURIComponent(locationMessage)}`;
+
+                        document.getElementById("locationLink").style.display = 'block';
+                    }, function(error) {
+                        alert("Error getting your location. Please try again later.");
+                        document.getElementById("loadingMessage").style.display = 'none';
+                    });
+                } else {
+                    alert("Geolocation is not supported by this browser.");
+                    document.getElementById("loadingMessage").style.display = 'none';
+                }
+            } else {
+                alert("Pet details not loaded. Please try again later.");
                 document.getElementById("loadingMessage").style.display = 'none';
             }
         });
