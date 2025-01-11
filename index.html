@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Share Location</title>
     <style>
-        #shareLocationButton, #callParentsButton, #whatsappParentButton {
+        #shareLocationButton, #callParentsButton, #whatsappParentButton, #emailParentButton {
             padding: 20px 40px;
             font-size: 24px;
             background-color: #007BFF;
@@ -19,7 +19,7 @@
             margin-top: 10px;
         }
 
-        #shareLocationButton:hover, #callParentsButton:hover, #whatsappParentButton:hover {
+        #shareLocationButton:hover, #callParentsButton:hover, #whatsappParentButton:hover, #emailParentButton:hover {
             background-color: #0056b3;
         }
 
@@ -43,9 +43,7 @@
 </head>
 <body>
 
-    <button id="shareLocationButton">Share Pet's Location</button>
-
-    <!-- Loading message while waiting for location -->
+    <!-- Share Pet's Location button removed, since data will load automatically -->
     <div id="loadingMessage">Please wait... Retrieving your location...</div>
 
     <div id="locationLink">
@@ -56,9 +54,11 @@
 
     <button id="callParentsButton">Call Pet's Parents</button>
     <button id="whatsappParentButton">WhatsApp Pet's Parent</button>
+    <button id="emailParentButton">Email Pet's Parent</button>
 
     <script>
-        document.getElementById("shareLocationButton").addEventListener("click", function() {
+        window.onload = function() {
+            // Fetch data automatically when the page loads
             document.getElementById("loadingMessage").style.display = 'block';
 
             const urlParams = new URLSearchParams(window.location.search);
@@ -91,13 +91,17 @@
 
                                 // WhatsApp Pet's Parent functionality
                                 document.getElementById("whatsappParentButton").addEventListener("click", function() {
-                                    // Ensure the parentPhone is in correct format (e.g., +1234567890)
-                                    const formattedPhone = data.parentPhone.replace(/\s+/g, '').replace(/\D/g, ''); // Remove spaces and non-numeric characters
+                                    const formattedPhone = data.parentPhone.replace(/\s+/g, '').replace(/\D/g, ''); 
                                     const whatsappParentLink = `https://wa.me/${formattedPhone}?text=Hi, I am contacting you regarding ${data.petName}.`;
-                                    
-                                    // Open the WhatsApp link
                                     window.open(whatsappParentLink, "_blank");
                                 });
+
+                                // Email Pet's Parent functionality
+                                document.getElementById("emailParentButton").addEventListener("click", function() {
+                                    const emailParentLink = `mailto:${data.parentEmail}?subject=Regarding ${data.petName}&body=Hi, I am contacting you regarding ${data.petName}.`;
+                                    window.location.href = emailParentLink;
+                                });
+
                             }, function(error) {
                                 alert("Error getting your location. Please try again later.");
                                 document.getElementById("loadingMessage").style.display = 'none';
@@ -115,7 +119,7 @@
                 alert("Invalid or missing code.");
                 document.getElementById("loadingMessage").style.display = 'none';
             }
-        });
+        };
     </script>
 
 </body>
