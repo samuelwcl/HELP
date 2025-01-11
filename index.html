@@ -84,7 +84,7 @@
                         petData = data; // Store fetched data globally
                         console.log("Fetched pet data:", petData); // Debugging
 
-                        // Update button event listeners now that we have data
+                        // Call parent's phone
                         document.getElementById("callParentsButton").addEventListener("click", function () {
                             if (petData && petData.phone) {
                                 window.location.href = `tel:${petData.phone}`;
@@ -93,12 +93,15 @@
                             }
                         });
 
+                        // WhatsApp parent's phone
                         document.getElementById("whatsappParentsButton").addEventListener("click", function () {
                             if (petData && petData.phone) {
+                                // Ensure the phone number starts with "+"
                                 const phoneNumber = petData.phone.startsWith("+")
-                                    ? petData.phone.slice(1) // Remove "+" for WhatsApp link
-                                    : petData.phone;
-                                const whatsappParentLink = `https://wa.me/${phoneNumber}?text=Hi, I am contacting you regarding ${petData.petName}.`;
+                                    ? petData.phone
+                                    : `+${petData.phone}`;
+                                
+                                const whatsappParentLink = `https://wa.me/${phoneNumber.replace(/[^0-9]/g, "")}?text=Hi, I am contacting you regarding ${petData.petName}.`;
                                 console.log("Generated WhatsApp link:", whatsappParentLink); // Debugging
                                 window.open(whatsappParentLink, "_blank");
                             } else {
