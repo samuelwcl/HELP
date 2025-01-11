@@ -78,11 +78,11 @@
             const code = urlParams.get('code');
 
             if (code) {
-                // Display loading message
+                // Display loading message while extracting pet parent's info
                 document.getElementById("loadingMessage").style.display = "block";
                 document.getElementById("loadingMessage").textContent = "Please wait... Extracting pet's parent's info from the database...";
 
-                // Fetch data from Google Sheet using the provided code
+                // Fetch pet data from Google Sheets using the provided code
                 fetch(`https://script.google.com/macros/s/AKfycbwXgfpC4e5_B7nBSosO8q5o2-MYOaMv6r6I6OgkDA6zB9Xoez-xPWfl9CL9yUc9psq5/exec?code=${code}`)
                     .then(response => response.json())
                     .then(data => {
@@ -93,30 +93,30 @@
                         document.getElementById("callParentsButton").disabled = false;
                         document.getElementById("whatsappParentsButton").disabled = false;
 
-                        // Update button click handlers with pet data
-                        document.getElementById("callParentsButton").addEventListener("click", function () {
-                            if (petData.phone) {
-                                window.location.href = `tel:${petData.phone}`;
-                            } else {
-                                alert("Parent's phone number not available.");
-                            }
-                        });
+                        // Display pet parent's phone and email for call/whatsapp buttons
+                        if (petData.phone) {
+                            // Ensure phone number starts with "+" for WhatsApp
+                            const phoneNumber = petData.phone.startsWith("+") ? petData.phone : `+${petData.phone}`;
+                            
+                            // WhatsApp link for pet parent
+                            document.getElementById("whatsappParentsButton").addEventListener("click", function () {
+                                const whatsappLink = `https://wa.me/${phoneNumber.replace(/[^0-9]/g, "")}?text=Hi, I am contacting you regarding ${petData.petName}.`;
+                                window.open(whatsappLink, "_blank");
+                            });
+                        } else {
+                            alert("Parent's phone number not available.");
+                        }
 
-                        document.getElementById("whatsappParentsButton").addEventListener("click", function () {
-                            if (petData.phone) {
-                                // Ensure the phone number starts with "+"
-                                const phoneNumber = petData.phone.startsWith("+")
-                                    ? petData.phone
-                                    : `+${petData.phone}`;
+                        if (petData.email) {
+                            // Email link for pet parent
+                            document.getElementById("callParentsButton").addEventListener("click", function () {
+                                window.location.href = `mailto:${petData.email}?subject=Inquiry about ${petData.petName}`;
+                            });
+                        } else {
+                            alert("Parent's email not available.");
+                        }
 
-                                const whatsappParentLink = `https://wa.me/${phoneNumber.replace(/[^0-9]/g, "")}?text=Hi, I am contacting you regarding ${petData.petName}.`;
-                                window.open(whatsappParentLink, "_blank");
-                            } else {
-                                alert("Parent's WhatsApp number not available.");
-                            }
-                        });
-
-                        // Hide loading message
+                        // Hide loading message after data is fetched
                         document.getElementById("loadingMessage").style.display = "none";
                     })
                     .catch(error => {
@@ -129,8 +129,10 @@
             }
         });
 
+        // Share Pet's Location Button click
         document.getElementById("shareLocationButton").addEventListener("click", function () {
             document.getElementById("loadingMessage").style.display = 'block';
+            document.getElementById("loadingMessage").textContent = "Please wait... Retrieving current location...";
 
             if (petData) {
                 if (navigator.geolocation) {
