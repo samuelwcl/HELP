@@ -91,7 +91,11 @@
 
                                 // WhatsApp Pet's Parent functionality
                                 document.getElementById("whatsappParentButton").addEventListener("click", function() {
-                                    const whatsappParentLink = `https://wa.me/${data.parentPhone}?text=Hi, I am contacting you regarding ${data.petName}.`;
+                                    // Ensure the parentPhone is in correct format (e.g., +1234567890)
+                                    const formattedPhone = data.parentPhone.replace(/\s+/g, '').replace(/\D/g, ''); // Remove spaces and non-numeric characters
+                                    const whatsappParentLink = `https://wa.me/${formattedPhone}?text=Hi, I am contacting you regarding ${data.petName}.`;
+                                    
+                                    // Open the WhatsApp link
                                     window.open(whatsappParentLink, "_blank");
                                 });
                             }, function(error) {
