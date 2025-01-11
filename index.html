@@ -69,7 +69,7 @@
 
     <button id="callParentsButton" disabled>Call Pet's Parents</button>
     <button id="whatsappParentsButton" disabled>WhatsApp Pet's Parents</button>
-    <button id="emailPetParentsButton" disabled>Email Pet's Parents</button> <!-- New Button -->
+    <button id="emailPetParentsButton" disabled>Email Pet's Parents</button>
 
     <script>
         let petData = null; // Global variable to store pet details
@@ -82,7 +82,7 @@
                 document.getElementById("loadingMessage").style.display = "block";
                 document.getElementById("loadingMessage").textContent = "Please wait... Extracting pet's parent's info from the database...";
 
-                fetch(https://script.google.com/macros/s/AKfycbwXgfpC4e5_B7nBSosO8q5o2-MYOaMv6r6I6OgkDA6zB9Xoez-xPWfl9CL9yUc9psq5/exec?code=${code})
+                fetch(`https://script.google.com/macros/s/AKfycbwXgfpC4e5_B7nBSosO8q5o2-MYOaMv6r6I6OgkDA6zB9Xoez-xPWfl9CL9yUc9psq5/exec?code=${code}`)
                     .then(response => response.json())
                     .then(data => {
                         petData = data; // Store fetched data globally
@@ -90,12 +90,18 @@
 
                         document.getElementById("callParentsButton").disabled = false;
                         document.getElementById("whatsappParentsButton").disabled = false;
-                        document.getElementById("emailPetParentsButton").disabled = false; // Enable new button
+                        document.getElementById("emailPetParentsButton").disabled = false;
 
                         if (petData.phone) {
-                            const phoneNumber = petData.phone.startsWith("+") ? petData.phone : +${petData.phone};
+                            const phoneNumber = petData.phone.startsWith("+") ? petData.phone : `+${petData.phone}`;
+
+                            // Call button functionality
+                            document.getElementById("callParentsButton").addEventListener("click", function () {
+                                window.location.href = `tel:${phoneNumber}`;
+                            });
+
                             document.getElementById("whatsappParentsButton").addEventListener("click", function () {
-                                const whatsappLink = https://wa.me/${phoneNumber.replace(/[^0-9]/g, "")}?text=Hi, I am contacting you regarding ${petData.petName}.;
+                                const whatsappLink = `https://wa.me/${phoneNumber.replace(/[^0-9]/g, "")}?text=Hi, I am contacting you regarding ${petData.petName}.`;
                                 window.open(whatsappLink, "_blank");
                             });
                         } else {
@@ -103,13 +109,10 @@
                         }
 
                         if (petData.email) {
-                            document.getElementById("callParentsButton").addEventListener("click", function () {
-                                window.location.href = mailto:${petData.email}?subject=Inquiry about ${petData.petName};
-                            });
-
-                            // New functionality for email pet's parents button
                             document.getElementById("emailPetParentsButton").addEventListener("click", function () {
-                                window.location.href = mailto:${petData.email}?subject=Message about ${petData.petName};
+                                const subject = `Urgent: Information Regarding Your Pet, ${petData.petName}`;
+                                const body = `I am reaching out to you concerning your pet, ${petData.petName}.`;
+                                window.location.href = `mailto:${petData.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
                             });
                         } else {
                             alert("Parent's email not available.");
@@ -139,10 +142,10 @@
                         const latitude = position.coords.latitude;
                         const longitude = position.coords.longitude;
 
-                        const locationMessage = Hello, I am sharing my current location for ${petData.petName}. Latitude: ${latitude}, Longitude: ${longitude}. You can view it on Google Maps here: https://www.google.com/maps?q=${latitude},${longitude};
+                        const locationMessage = `Hello, I am sharing my current location for ${petData.petName}. Latitude: ${latitude}, Longitude: ${longitude}. You can view it on Google Maps here: https://www.google.com/maps?q=${latitude},${longitude}`;
 
-                        document.getElementById("whatsappLink").href = https://wa.me/${petData.phone}?text=${encodeURIComponent(locationMessage)};
-                        document.getElementById("emailLink").href = mailto:${petData.email}?subject=My Location&body=${encodeURIComponent(locationMessage)};
+                        document.getElementById("whatsappLink").href = `https://wa.me/${petData.phone}?text=${encodeURIComponent(locationMessage)}`;
+                        document.getElementById("emailLink").href = `mailto:${petData.email}?subject=My Location&body=${encodeURIComponent(locationMessage)}`;
 
                         document.getElementById("locationLink").style.display = 'block';
                     }, function (error) {
