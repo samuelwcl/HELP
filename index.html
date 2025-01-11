@@ -110,7 +110,7 @@
                             // New functionality for email pet's parents button
                             document.getElementById("emailPetParentsButton").addEventListener("click", function () {
                                 const subject = `Urgent: Information Regarding Your Pet, ${petData.petName}`;
-                                const body = `Dear ${petData.parentName},\n\nI hope this message finds you well. I am reaching out to you concerning your pet, ${petData.petName}.\n\n[Add your specific message or concern here.]\n\nPlease do not hesitate to contact me if further information is needed.\n\nBest regards,\n[Your Name]`;
+                                const body = `I am reaching out to you concerning your pet, ${petData.petName}.`;
                                 window.location.href = `mailto:${petData.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
                             });
                         } else {
