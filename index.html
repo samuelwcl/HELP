@@ -80,6 +80,7 @@
             if (code) {
                 // Display loading message
                 document.getElementById("loadingMessage").style.display = "block";
+                document.getElementById("loadingMessage").textContent = "Please wait... Extracting pet's parent's info from the database...";
 
                 // Fetch data from Google Sheet using the provided code
                 fetch(`https://script.google.com/macros/s/AKfycbwXgfpC4e5_B7nBSosO8q5o2-MYOaMv6r6I6OgkDA6zB9Xoez-xPWfl9CL9yUc9psq5/exec?code=${code}`)
