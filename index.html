@@ -67,8 +67,8 @@
         <a id="emailLink" href="#" target="_blank">Send via Email</a>
     </div>
 
-    <button id="callParentsButton">Call Pet's Parents</button>
-    <button id="whatsappParentsButton">WhatsApp Pet's Parents</button>
+    <button id="callParentsButton" disabled>Call Pet's Parents</button>
+    <button id="whatsappParentsButton" disabled>WhatsApp Pet's Parents</button>
 
     <script>
         let petData = null; // Global variable to store pet details
@@ -78,40 +78,50 @@
             const code = urlParams.get('code');
 
             if (code) {
+                // Display loading message
+                document.getElementById("loadingMessage").style.display = "block";
+
+                // Fetch data from Google Sheet using the provided code
                 fetch(`https://script.google.com/macros/s/AKfycbwXgfpC4e5_B7nBSosO8q5o2-MYOaMv6r6I6OgkDA6zB9Xoez-xPWfl9CL9yUc9psq5/exec?code=${code}`)
                     .then(response => response.json())
                     .then(data => {
                         petData = data; // Store fetched data globally
-                        console.log("Fetched pet data:", petData); // Debugging
+                        console.log("Fetched pet data:", petData);
 
-                        // Call parent's phone
+                        // Enable buttons now that data is available
+                        document.getElementById("callParentsButton").disabled = false;
+                        document.getElementById("whatsappParentsButton").disabled = false;
+
+                        // Update button click handlers with pet data
                         document.getElementById("callParentsButton").addEventListener("click", function () {
-                            if (petData && petData.phone) {
+                            if (petData.phone) {
                                 window.location.href = `tel:${petData.phone}`;
                             } else {
                                 alert("Parent's phone number not available.");
                             }
                         });
 
-                        // WhatsApp parent's phone
                         document.getElementById("whatsappParentsButton").addEventListener("click", function () {
-                            if (petData && petData.phone) {
+                            if (petData.phone) {
                                 // Ensure the phone number starts with "+"
                                 const phoneNumber = petData.phone.startsWith("+")
                                     ? petData.phone
                                     : `+${petData.phone}`;
-                                
+
                                 const whatsappParentLink = `https://wa.me/${phoneNumber.replace(/[^0-9]/g, "")}?text=Hi, I am contacting you regarding ${petData.petName}.`;
-                                console.log("Generated WhatsApp link:", whatsappParentLink); // Debugging
                                 window.open(whatsappParentLink, "_blank");
                             } else {
                                 alert("Parent's WhatsApp number not available.");
                             }
                         });
+
+                        // Hide loading message
+                        document.getElementById("loadingMessage").style.display = "none";
                     })
                     .catch(error => {
                         console.error("Error fetching pet data:", error);
                         alert("Error fetching data. Please try again later.");
+                        document.getElementById("loadingMessage").style.display = "none";
                     });
             } else {
                 alert("Invalid or missing code.");
