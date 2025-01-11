@@ -68,7 +68,7 @@
     </div>
 
     <button id="callParentsButton">Call Pet's Parents</button>
-    <button id="whatsappParentButton">WhatsApp Pet's Parent</button>
+    <button id="whatsappParentsButton">WhatsApp Parents</button>
 
     <script>
         document.getElementById("shareLocationButton").addEventListener("click", function() {
@@ -102,7 +102,7 @@
                                     window.location.href = `tel:${data.phone}`;
                                 });
 
-                                document.getElementById("whatsappParentButton").addEventListener("click", function() {
+                                document.getElementById("whatsappParentsButton").addEventListener("click", function() {
                                     const whatsappParentLink = `https://wa.me/${data.parentPhone}?text=Hi, I am contacting you regarding ${data.petName}.`;
                                     window.open(whatsappParentLink, "_blank");
                                 });
