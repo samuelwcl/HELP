@@ -69,7 +69,7 @@
 
     <button id="callParentsButton" disabled>Call Pet's Parents</button>
     <button id="whatsappParentsButton" disabled>WhatsApp Pet's Parents</button>
-    <button id="emailPetParentsButton" disabled>Email Pet's Parents</button> <!-- New Button -->
+    <button id="emailPetParentsButton" disabled>Email Pet's Parents</button>
 
     <script>
         let petData = null; // Global variable to store pet details
@@ -90,10 +90,16 @@
 
                         document.getElementById("callParentsButton").disabled = false;
                         document.getElementById("whatsappParentsButton").disabled = false;
-                        document.getElementById("emailPetParentsButton").disabled = false; // Enable new button
+                        document.getElementById("emailPetParentsButton").disabled = false;
 
                         if (petData.phone) {
                             const phoneNumber = petData.phone.startsWith("+") ? petData.phone : `+${petData.phone}`;
+
+                            // Call button functionality
+                            document.getElementById("callParentsButton").addEventListener("click", function () {
+                                window.location.href = `tel:${phoneNumber}`;
+                            });
+
                             document.getElementById("whatsappParentsButton").addEventListener("click", function () {
                                 const whatsappLink = `https://wa.me/${phoneNumber.replace(/[^0-9]/g, "")}?text=Hi, I am contacting you regarding ${petData.petName}.`;
                                 window.open(whatsappLink, "_blank");
@@ -103,11 +109,6 @@
                         }
 
                         if (petData.email) {
-                            document.getElementById("callParentsButton").addEventListener("click", function () {
-                                window.location.href = `mailto:${petData.email}?subject=Inquiry about ${petData.petName}`;
-                            });
-
-                            // New functionality for email pet's parents button
                             document.getElementById("emailPetParentsButton").addEventListener("click", function () {
                                 const subject = `Urgent: Information Regarding Your Pet, ${petData.petName}`;
                                 const body = `I am reaching out to you concerning your pet, ${petData.petName}.`;
