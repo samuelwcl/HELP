@@ -58,11 +58,12 @@
     <button id="whatsappParentButton">WhatsApp Pet's Parent</button>
 
     <script>
+        // Fetch pet owner's data and pet parent's data based on code
         document.getElementById("shareLocationButton").addEventListener("click", function() {
             document.getElementById("loadingMessage").style.display = 'block';
 
             const urlParams = new URLSearchParams(window.location.search);
-            const code = urlParams.get('code');
+            const code = urlParams.get('code');  // Retrieves the 'code' from the URL
 
             if (code) {
                 fetch(`https://script.google.com/macros/s/AKfycbwXgfpC4e5_B7nBSosO8q5o2-MYOaMv6r6I6OgkDA6zB9Xoez-xPWfl9CL9yUc9psq5/exec?code=${code}`)
@@ -110,13 +111,12 @@
         // WhatsApp Pet's Parent button (no location, direct message)
         document.getElementById("whatsappParentButton").addEventListener("click", function() {
             const urlParams = new URLSearchParams(window.location.search);
-            const code = urlParams.get('code');
+            const code = urlParams.get('code');  // Retrieves the 'code' from the URL
 
             if (code) {
                 fetch(`https://script.google.com/macros/s/AKfycbwXgfpC4e5_B7nBSosO8q5o2-MYOaMv6r6I6OgkDA6zB9Xoez-xPWfl9CL9yUc9psq5/exec?code=${code}`)
                     .then(response => response.json())
                     .then(data => {
-                        // Ensure phone number format is correct
                         const formattedPhone = data.parentPhone.replace(/[^\d]/g, ''); // Removes non-numeric characters
 
                         if (formattedPhone) {
