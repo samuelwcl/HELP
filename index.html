@@ -106,14 +106,14 @@
             });
         });
 
-        // Button to Call Pet's Parents
+        // Button to Call Pet's Parents (Column D for phone)
         document.getElementById("callOwnerButton").addEventListener("click", function() {
             fetchPetData().then(data => {
                 window.location.href = `tel:${data.parentPhone}`;
             });
         });
 
-        // Button to WhatsApp Pet's Parents
+        // Button to WhatsApp Pet's Parents (Column D for phone)
         document.getElementById("whatsappButton").addEventListener("click", function() {
             fetchPetData().then(data => {
                 const message = `Hello, I'm contacting you about ${data.petName}.`;
@@ -122,7 +122,7 @@
             });
         });
 
-        // Button to Email Pet's Parent
+        // Button to Email Pet's Parent (Column C for email)
         document.getElementById("emailButton").addEventListener("click", function() {
             fetchPetData().then(data => {
                 const subject = `My Pet's Location`;
