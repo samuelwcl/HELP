@@ -93,14 +93,14 @@
 
     <!-- Upper Part: Logo, Title, and Description -->
     <div class="header">
-        <a href="https://www.ddmkqr.com" target="_blank">
+        <a href="https://www.ddmk.com.my" target="_blank">
             <img src="https://lh3.googleusercontent.com/ivmnV8Fqqx1UlsqGD6UmKcQ3QHYu70P_HVDm1RprbWLWsUJ5gX0_ShfPHzVJaqC7XS7RKUdE80bJ3CzZfXoH3Q=w16383" alt="DDMK Logo">
         </a>
         <h1 class="header-title">
             Help a Lost Pet Get <span>Home</span>
         </h1>
         <p class="header-description">
-            Your help can reunite this pet with its family. Please share your location or contact the pet's parent. Thank you!
+            Please HELP reunite this pet with its family. Thank you!
         </p>
     </div>
 
@@ -143,70 +143,11 @@
                         if (petData.phone) {
                             const phoneNumber = petData.phone.startsWith("+") ? petData.phone : `+${petData.phone}`;
 
-                            // Call button functionality
                             document.getElementById("callParentsButton").addEventListener("click", function () {
                                 window.location.href = `tel:${phoneNumber}`;
                             });
-
-                            document.getElementById("whatsappParentsButton").addEventListener("click", function () {
-                                const whatsappLink = `https://wa.me/${phoneNumber.replace(/[^0-9]/g, "")}?text=Hi, I am contacting you regarding ${petData.petName}.`;
-                                window.open(whatsappLink, "_blank");
-                            });
-                        } else {
-                            alert("Parent's phone number not available.");
                         }
-
-                        if (petData.email) {
-                            document.getElementById("emailPetParentsButton").addEventListener("click", function () {
-                                const subject = `Urgent: Information Regarding Your Pet, ${petData.petName}`;
-                                const body = `I am reaching out to you concerning your pet, ${petData.petName}.`;
-                                window.location.href = `mailto:${petData.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-                            });
-                        } else {
-                            alert("Parent's email not available.");
-                        }
-
-                        document.getElementById("loadingMessage").style.display = "none";
-                    })
-                    .catch(error => {
-                        console.error("Error fetching pet data:", error);
-                        alert("Error fetching data. Please try again later.");
-                        document.getElementById("loadingMessage").style.display = "none";
                     });
-            } else {
-                alert("Invalid or missing code.");
-            }
-        });
-
-        document.getElementById("shareLocationButton").addEventListener("click", function () {
-            document.getElementById("loadingMessage").style.display = 'block';
-            document.getElementById("loadingMessage").textContent = "Please wait... Retrieving current location...";
-
-            if (petData) {
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(function (position) {
-                        document.getElementById("loadingMessage").style.display = 'none';
-
-                        const latitude = position.coords.latitude;
-                        const longitude = position.coords.longitude;
-
-                        const locationMessage = `Hello, I am sharing my current location for ${petData.petName}. Latitude: ${latitude}, Longitude: ${longitude}. You can view it on Google Maps here: https://www.google.com/maps?q=${latitude},${longitude}`;
-
-                        document.getElementById("whatsappLink").href = `https://wa.me/${petData.phone}?text=${encodeURIComponent(locationMessage)}`;
-                        document.getElementById("emailLink").href = `mailto:${petData.email}?subject=My Location&body=${encodeURIComponent(locationMessage)}`;
-
-                        document.getElementById("locationLink").style.display = 'block';
-                    }, function (error) {
-                        alert("Error getting your location. Please try again later.");
-                        document.getElementById("loadingMessage").style.display = 'none';
-                    });
-                } else {
-                    alert("Geolocation is not supported by this browser.");
-                    document.getElementById("loadingMessage").style.display = 'none';
-                }
-            } else {
-                alert("Pet details not loaded. Please try again later.");
-                document.getElementById("loadingMessage").style.display = 'none';
             }
         });
     </script>
