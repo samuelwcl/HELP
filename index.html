@@ -83,6 +83,9 @@
                     .then(data => {
                         petData = data; // Store fetched data globally
 
+                        // Log the fetched data to check the structure
+                        console.log(petData);
+
                         // Update button event listeners now that we have data
                         document.getElementById("callParentsButton").addEventListener("click", function() {
                             if (petData && petData.phone) {
@@ -94,8 +97,18 @@
 
                         document.getElementById("whatsappParentsButton").addEventListener("click", function() {
                             if (petData && petData.parentPhone) {
-                                const whatsappParentLink = `https://wa.me/${petData.parentPhone}?text=Hi, I am contacting you regarding ${petData.petName}.`;
-                                window.open(whatsappParentLink, "_blank");
+                                // Clean up the phone number by removing non-numeric characters
+                                const cleanedPhone = petData.parentPhone.replace(/\D/g, '');  // Keep only digits
+
+                                console.log("Cleaned Parent's Phone: " + cleanedPhone);  // Log the cleaned phone number
+
+                                // Ensure the phone number is long enough (for example, 11 digits for Malaysia)
+                                if (cleanedPhone.length >= 10) {
+                                    const whatsappParentLink = `https://wa.me/${cleanedPhone}?text=Hi, I am contacting you regarding ${petData.petName}.`;
+                                    window.open(whatsappParentLink, "_blank");
+                                } else {
+                                    alert("Invalid parent's phone number format.");
+                                }
                             } else {
                                 alert("Parent's WhatsApp number not available.");
                             }
