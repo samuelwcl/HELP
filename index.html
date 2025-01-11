@@ -73,7 +73,7 @@
     <script>
         let petData = null; // Global variable to store pet details
 
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             const urlParams = new URLSearchParams(window.location.search);
             const code = urlParams.get('code');
 
@@ -82,12 +82,10 @@
                     .then(response => response.json())
                     .then(data => {
                         petData = data; // Store fetched data globally
-
-                        // Log the fetched data to check the structure
-                        console.log(petData);
+                        console.log(petData); // Debugging: Check the structure of the data
 
                         // Update button event listeners now that we have data
-                        document.getElementById("callParentsButton").addEventListener("click", function() {
+                        document.getElementById("callParentsButton").addEventListener("click", function () {
                             if (petData && petData.phone) {
                                 window.location.href = `tel:${petData.phone}`;
                             } else {
@@ -95,20 +93,13 @@
                             }
                         });
 
-                        document.getElementById("whatsappParentsButton").addEventListener("click", function() {
-                            if (petData && petData.parentPhone) {
-                                // Clean up the phone number by removing non-numeric characters
-                                const cleanedPhone = petData.parentPhone.replace(/\D/g, '');  // Keep only digits
-
-                                console.log("Cleaned Parent's Phone: " + cleanedPhone);  // Log the cleaned phone number
-
-                                // Ensure the phone number is long enough (for example, 11 digits for Malaysia)
-                                if (cleanedPhone.length >= 10) {
-                                    const whatsappParentLink = `https://wa.me/${cleanedPhone}?text=Hi, I am contacting you regarding ${petData.petName}.`;
-                                    window.open(whatsappParentLink, "_blank");
-                                } else {
-                                    alert("Invalid parent's phone number format.");
-                                }
+                        document.getElementById("whatsappParentsButton").addEventListener("click", function () {
+                            if (petData && petData.phone) {
+                                const phoneNumber = petData.phone.startsWith("6") 
+                                    ? petData.phone 
+                                    : `6${petData.phone}`; // Ensure international format
+                                const whatsappParentLink = `https://wa.me/${phoneNumber}?text=Hi, I am contacting you regarding ${petData.petName}.`;
+                                window.open(whatsappParentLink, "_blank");
                             } else {
                                 alert("Parent's WhatsApp number not available.");
                             }
@@ -123,12 +114,12 @@
             }
         });
 
-        document.getElementById("shareLocationButton").addEventListener("click", function() {
+        document.getElementById("shareLocationButton").addEventListener("click", function () {
             document.getElementById("loadingMessage").style.display = 'block';
 
             if (petData) {
                 if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(function(position) {
+                    navigator.geolocation.getCurrentPosition(function (position) {
                         document.getElementById("loadingMessage").style.display = 'none';
 
                         const latitude = position.coords.latitude;
@@ -140,7 +131,7 @@
                         document.getElementById("emailLink").href = `mailto:${petData.email}?subject=My Location&body=${encodeURIComponent(locationMessage)}`;
 
                         document.getElementById("locationLink").style.display = 'block';
-                    }, function(error) {
+                    }, function (error) {
                         alert("Error getting your location. Please try again later.");
                         document.getElementById("loadingMessage").style.display = 'none';
                     });
