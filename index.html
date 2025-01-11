@@ -58,12 +58,18 @@
     <button id="whatsappParentButton">WhatsApp Pet's Parent</button>
 
     <script>
-        // Fetch pet owner's data and pet parent's data based on code
+        document.getElementById("whatsappParentButton").addEventListener("click", function() {
+            const message = "Hi, I am contacting you regarding the pet.";
+            const phoneNumber = "+601169888962"; // Pet's parent's phone number
+            const whatsappLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+            window.open(whatsappLink, "_blank");
+        });
+
         document.getElementById("shareLocationButton").addEventListener("click", function() {
             document.getElementById("loadingMessage").style.display = 'block';
 
             const urlParams = new URLSearchParams(window.location.search);
-            const code = urlParams.get('code');  // Retrieves the 'code' from the URL
+            const code = urlParams.get('code');
 
             if (code) {
                 fetch(`https://script.google.com/macros/s/AKfycbwXgfpC4e5_B7nBSosO8q5o2-MYOaMv6r6I6OgkDA6zB9Xoez-xPWfl9CL9yUc9psq5/exec?code=${code}`)
@@ -105,33 +111,6 @@
             } else {
                 alert("Invalid or missing code.");
                 document.getElementById("loadingMessage").style.display = 'none';
-            }
-        });
-
-        // WhatsApp Pet's Parent button (no location, direct message)
-        document.getElementById("whatsappParentButton").addEventListener("click", function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const code = urlParams.get('code');  // Retrieves the 'code' from the URL
-
-            if (code) {
-                fetch(`https://script.google.com/macros/s/AKfycbwXgfpC4e5_B7nBSosO8q5o2-MYOaMv6r6I6OgkDA6zB9Xoez-xPWfl9CL9yUc9psq5/exec?code=${code}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        const formattedPhone = data.parentPhone.replace(/[^\d]/g, ''); // Removes non-numeric characters
-
-                        if (formattedPhone) {
-                            const message = `Hi, I am contacting you regarding ${data.petName}.`;
-                            const whatsappParentLink = `https://wa.me/${formattedPhone}?text=${encodeURIComponent(message)}`;
-                            window.open(whatsappParentLink, "_blank");
-                        } else {
-                            alert("Invalid phone number for Pet's Parent.");
-                        }
-                    })
-                    .catch(error => {
-                        alert("Error fetching data. Please try again later.");
-                    });
-            } else {
-                alert("Invalid or missing code.");
             }
         });
     </script>
