@@ -4,10 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Share Location</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Poppins', Arial, sans-serif;
+            font-family: Arial, sans-serif;
             text-align: center;
             padding: 20px;
             background-color: #f9f9f9;
@@ -16,26 +15,20 @@
         .header {
             padding: 20px;
             background-color: #ffffff;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
         }
 
         .header img {
             max-width: 200px;
             height: auto;
+            display: block;
+            margin: 0 auto;
         }
 
         .header-title {
-            font-size: 2rem;
+            font-size: 1.8rem;
             font-weight: bold;
             margin: 20px 0;
-        }
-
-        .header-title span {
-            color: #fbb116; /* Yellow color from the logo */
-        }
-
-        .header-title {
             color: #0056b3; /* Blue color from the logo */
         }
 
@@ -48,15 +41,15 @@
         }
 
         button {
-            padding: 20px 40px;
-            font-size: 20px;
+            padding: 15px 30px;
+            font-size: 18px;
             background-color: #007BFF;
             color: white;
             border: none;
             cursor: pointer;
             width: 100%;
-            max-width: 400px;
-            border-radius: 8px;
+            max-width: 300px;
+            border-radius: 5px;
             margin: 10px 0;
         }
 
@@ -71,7 +64,7 @@
 
         #locationLink a {
             display: block;
-            font-size: 18px;
+            font-size: 16px;
             margin-top: 10px;
             color: #007BFF;
             text-decoration: none;
@@ -83,7 +76,7 @@
 
         #loadingMessage {
             display: none;
-            font-size: 18px;
+            font-size: 16px;
             color: #555;
             margin-top: 20px;
         }
@@ -94,10 +87,16 @@
     <!-- Upper Part: Logo, Title, and Description -->
     <div class="header">
         <a href="https://www.ddmk.com.my" target="_blank">
-            <img src="https://raw.githubusercontent.com/samuelwcl/ddmklogo/refs/heads/main/ddmk.jpg" alt="DDMK Logo" width="400" height="auto">
+            <img 
+                src="https://raw.githubusercontent.com/samuelwcl/ddmklogo/refs/heads/main/ddmk.jpg" 
+                alt="DDMK Logo" 
+                loading="lazy"
+                width="400"
+                height="auto"
+            >
         </a>
         <h1 class="header-title">
-            Help a Lost Pet Get <span>Home</span>
+            Help a Lost Pet Get Home
         </h1>
         <p class="header-description">
             Please HELP reunite this pet with its family. Thank you!
@@ -120,35 +119,94 @@
     <button id="emailPetParentsButton" disabled>Email Pet's Parents</button>
 
     <script>
-        let petData = null; // Global variable to store pet details
-
         document.addEventListener("DOMContentLoaded", function () {
             const urlParams = new URLSearchParams(window.location.search);
             const code = urlParams.get('code');
+            const loadingMessage = document.getElementById("loadingMessage");
+            const callButton = document.getElementById("callParentsButton");
+            const whatsappButton = document.getElementById("whatsappParentsButton");
+            const emailButton = document.getElementById("emailPetParentsButton");
+
+            let petData = null; // Global variable to store pet details
 
             if (code) {
-                document.getElementById("loadingMessage").style.display = "block";
-                document.getElementById("loadingMessage").textContent = "Please wait... Extracting pet's parent's info from the database...";
+                loadingMessage.style.display = "block";
+                loadingMessage.textContent = "Please wait... Extracting pet's parent's info from the database...";
 
+                // Fetch pet data
                 fetch(`https://script.google.com/macros/s/AKfycbwXgfpC4e5_B7nBSosO8q5o2-MYOaMv6r6I6OgkDA6zB9Xoez-xPWfl9CL9yUc9psq5/exec?code=${code}`)
                     .then(response => response.json())
                     .then(data => {
                         petData = data; // Store fetched data globally
                         console.log("Fetched pet data:", petData);
 
-                        document.getElementById("callParentsButton").disabled = false;
-                        document.getElementById("whatsappParentsButton").disabled = false;
-                        document.getElementById("emailPetParentsButton").disabled = false;
+                        // Enable buttons
+                        callButton.disabled = false;
+                        whatsappButton.disabled = false;
+                        emailButton.disabled = false;
 
                         if (petData.phone) {
                             const phoneNumber = petData.phone.startsWith("+") ? petData.phone : `+${petData.phone}`;
-
-                            document.getElementById("callParentsButton").addEventListener("click", function () {
+                            
+                            // Call button
+                            callButton.addEventListener("click", function () {
                                 window.location.href = `tel:${phoneNumber}`;
                             });
+
+                            // WhatsApp button
+                            whatsappButton.addEventListener("click", function () {
+                                const whatsappLink = `https://wa.me/${phoneNumber.replace(/[^0-9]/g, "")}?text=Hi, I am contacting you regarding ${petData.petName}.`;
+                                window.open(whatsappLink, "_blank");
+                            });
                         }
+
+                        if (petData.email) {
+                            // Email button
+                            emailButton.addEventListener("click", function () {
+                                const subject = `Urgent: Information Regarding Your Pet, ${petData.petName}`;
+                                const body = `I am reaching out to you concerning your pet, ${petData.petName}.`;
+                                window.location.href = `mailto:${petData.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                            });
+                        }
+
+                        loadingMessage.style.display = "none";
+                    })
+                    .catch(error => {
+                        console.error("Error fetching pet data:", error);
+                        alert("Error fetching data. Please try again later.");
+                        loadingMessage.style.display = "none";
                     });
+            } else {
+                alert("Invalid or missing code.");
             }
+
+            // Location sharing logic
+            document.getElementById("shareLocationButton").addEventListener("click", function () {
+                loadingMessage.style.display = 'block';
+                loadingMessage.textContent = "Please wait... Retrieving current location...";
+
+                if (petData && navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(function (position) {
+                        loadingMessage.style.display = 'none';
+
+                        const latitude = position.coords.latitude;
+                        const longitude = position.coords.longitude;
+
+                        const locationMessage = `Hello, I am sharing my current location for ${petData.petName}. Latitude: ${latitude}, Longitude: ${longitude}. You can view it on Google Maps here: https://www.google.com/maps?q=${latitude},${longitude}`;
+
+                        document.getElementById("whatsappLink").href = `https://wa.me/${petData.phone}?text=${encodeURIComponent(locationMessage)}`;
+                        document.getElementById("emailLink").href = `mailto:${petData.email}?subject=My Location&body=${encodeURIComponent(locationMessage)}`;
+
+                        document.getElementById("locationLink").style.display = 'block';
+                    }, function () {
+                        alert("Error getting your location. Please try again later.");
+                        loadingMessage.style.display = 'none';
+                    });
+                } else {
+                    alert("Pet details not loaded. Please try again later.");
+                    loadingMessage.style.display = 'none';
+                }
+            });
         });
     </script>
 
